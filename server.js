@@ -1,19 +1,16 @@
 // server.js
-// where your node app starts
-
-// init project
+const bodyParser = require('body-parser')
 var express = require('express');
 var app = express();
+app.use(bodyParser.urlencoded({ extended: false }))
 
-// enable CORS (https://en.wikipedia.org/wiki/Cross-origin_resource_sharing)
-// so that your API is remotely testable by FCC 
 var cors = require('cors');
 app.use(cors({optionSuccessStatus: 200}));  // some legacy browsers choke on 204
-
-// http://expressjs.com/en/starter/static-files.html
 app.use(express.static('public'));
 
-// http://expressjs.com/en/starter/basic-routing.html
+var date = new Date()
+
+
 app.get("/", function (req, res) {
   res.sendFile(__dirname + '/views/index.html');
 });
@@ -25,8 +22,20 @@ app.get("/api/hello", function (req, res) {
 });
 
 
+app.get("/api/timestamp/:date_string?", (req, res) => {
+  const reqDate = req.params.date_string
+  const utc = new Date(reqDate).toUTCString()
+  const unixDate = new Date(reqDate).getTime()
+  console.log(reqDate)
+  if (reqDate === undefined){
+    res.json({"unix": date.toUTCString(), "utc":date.getTime()})
+  }
+   res.json({"unix": unixDate, "utc": utc})
+ 
+})
+
 
 // listen for requests :)
-var listener = app.listen(process.env.PORT, function () {
+var listener = app.listen(3000, function () {
   console.log('Your app is listening on port ' + listener.address().port);
 });
